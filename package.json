@@ -1,8 +1,8 @@
 {
   "name": "doodl",
-  "homepage": "http://oscarwong67.github.io/doodl",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://oscarwong67.github.io/doodl",
   "dependencies": {
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
