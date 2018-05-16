@@ -23,7 +23,7 @@ module.exports = class Game {
     leave(name, id) {
         let index = this.playerNames.indexOf(name);
         this.players.delete(id);
-        delete this.playerNames[index];
+        this.playerNames.splice(index, 1);
         this.numPlayers--;
     }
 }

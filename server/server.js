@@ -79,6 +79,7 @@ function handleLeave(client, id, name, key) {
         games.get(key).leave(name, id);  //remove player from games object
         if (games.get(key).numPlayers == 0) { //if no players remaining, delete room from list of games
             games.delete(key);
+            return;
         }
         console.log("User " + client.id + " has left room " + key);
         io.sockets.in(key).emit('leave', name, key, games.get(key).playerNames);    //tell everyone client has left

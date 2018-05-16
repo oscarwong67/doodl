@@ -14,7 +14,9 @@ class App extends Component {
       id: '',
       name: '',
       gameKey: '',
-      players: []
+      players: [],
+      invalidKey: false,
+      ableToJoin: false
     }
   }
   componentDidMount() {
@@ -25,6 +27,11 @@ class App extends Component {
   }
   handleError = (error) => {
     console.log("whoa, an error! error: " + error);
+    if (error.toString() === "invalid key") {
+      this.setState({
+        invalidKey: true
+      })
+    }
   }
   createLobby = (name) => {
     //listen for players joining, and errors
@@ -47,7 +54,9 @@ class App extends Component {
       id: clientID,
       name: name,
       gameKey: key,
-      players: playerNames
+      players: playerNames,
+      invalidKey: false,
+      ableToJoin: true
     })
     console.log("You, " + name + " have joined room " + key);
     socket.on('join', this.handleJoin);  //listen for other people joining
@@ -79,7 +88,7 @@ class App extends Component {
   }
   renderView = () => {
     if (this.state.view === 'start') {
-      return (<Start view={this.startLobby} createLobby={this.createLobby} joinLobby={this.joinLobby} />);
+      return (<Start view={this.startLobby} invalidKey={this.state.invalidKey} ableToJoin={this.state.ableToJoin} createLobby={this.createLobby} joinLobby={this.joinLobby} />);
     }
     if (this.state.view === 'lobby') {
       return (<Lobby players={this.state.players} />)
