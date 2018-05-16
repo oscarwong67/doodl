@@ -47,13 +47,14 @@ function handleCreate(client, name) {
     });
     games.get(key).join(name, client.id);
 
-    console.log("now, having the client join the room...")
-    client.emit('selfJoin', client.id, name, key); //tell client that they've joined the server
-    io.sockets.in(key).emit('join', name, key); //tell everyone they've joined
+    console.log("now, having the client join the room...");
+    
+    client.emit('selfJoin', client.id, name, key, games.get(key).playerNames); //tell client they've joined
+    io.sockets.in(key).emit('join', name, key, games.get(key).playerNames); //tell everyone they've joined
 }
 
 function handleJoin(client, name, key) {
-    if (games.get(key) == undefined) {   //if game key was invalid
+    if (! games.get(key)) {   //if game key was invalid
         client.emit('err', "invalid key");
         return;
     } else if (games.get(key).numPlayers >= 10) {  //if game is full
@@ -68,20 +69,21 @@ function handleJoin(client, name, key) {
     });
     games.get(key).join(name, client.id);
 
-    client.emit('selfJoin', client.id, name, key); //tell client they've joined
-    io.sockets.in(key).emit('join', name, key); //tell everyone they've joined
+    client.emit('selfJoin', client.id, name, key, games.get(key).playerNames); //tell client they've joined
+    io.sockets.in(key).emit('join', name, key, games.get(key).playerNames); //tell everyone they've joined
 }
 
-function handleLeave(client, id, name, key) {
-    client.leave(key);  //leave the room
-    if (games.size > 0) {
-        games.get(key).leave(id);  //remove player from games object
+function handleLeave(client, id, name, key) {    
+    if (games.get(key)) {
+        client.leave(key);  //leave the room
+        games.get(key).leave(name, id);  //remove player from games object
         if (games.get(key).numPlayers == 0) { //if no players remaining, delete room from list of games
             games.delete(key);
         }
         console.log("User " + client.id + " has left room " + key);
-        io.sockets.in(key).emit('leave', name, key);    //tell everyone client has left
+        io.sockets.in(key).emit('leave', name, key, games.get(key).playerNames);    //tell everyone client has left
     }
+
 }
 
 function handleReady(name, key) {

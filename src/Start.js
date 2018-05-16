@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { createLobby, joinLobby } from './api';
 import { Button, Col, Container, Input, InputGroup, Row } from 'reactstrap';
 const styles = {
     containerStyle: {
@@ -41,12 +40,12 @@ class Start extends Component {
                 invalidName: true
             })
         } else {
-            createLobby(this.state.name);
+            this.props.createLobby(this.state.name);
             this.props.view();
         }
     }
     joinGame = () => {
-        joinLobby(this.state.name, this.state.input);
+        this.props.joinLobby(this.state.name, this.state.input);
         this.props.view();
     }
     render() {

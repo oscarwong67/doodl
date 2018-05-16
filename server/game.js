@@ -9,17 +9,21 @@ module.exports = class Game {
         this.key = key;
         this.numPlayers = 0;
         this.players = new Map();
+        this.playerNames = [];
     }
 
     join(name, id) {
         let temp = new Player(name, id);
         this.numPlayers++;
         this.players.set(temp.id, temp);
+        this.playerNames.push(temp.name);
         return temp.id;
     }
 
-    leave(id) {
+    leave(name, id) {
+        let index = this.playerNames.indexOf(name);
         this.players.delete(id);
+        delete this.playerNames[index];
         this.numPlayers--;
     }
 }
