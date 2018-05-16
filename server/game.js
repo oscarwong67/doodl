@@ -11,10 +11,15 @@ module.exports = class Game {
         this.players = new Map();
     }
 
-    join(name) {
-        let temp = new Player(name, this.numPlayers);
+    join(name, id) {
+        let temp = new Player(name, id);
         this.numPlayers++;
         this.players.set(temp.id, temp);
         return temp.id;
+    }
+
+    leave(id) {
+        this.players.delete(id);
+        this.numPlayers--;
     }
 }

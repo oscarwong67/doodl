@@ -1,25 +1,28 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import {createLobby, joinLobby} from './api';
+import Start from './Start';
+import Lobby from './Lobby';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      input: ''
+      view: 'start'
     }
   }
-  createGame = () => {
-    createLobby("user1");
-  }
-  handleChange = (e) => {
+  startLobby = () => {
     this.setState({
-      input: e.target.value
-    });
+      view: 'lobby'
+    })
   }
-  joinGame = () => {
-    joinLobby("user1", this.state.input);
+  renderView = () => {
+    if (this.state.view === 'start') {
+      return (<Start view={this.startLobby} />);
+    }
+    if (this.state.view === 'lobby') {
+      return (<Lobby />)
+    }
   }
   render() {
     return (
@@ -28,11 +31,7 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to Doodl</h1>
         </header>
-        <p className="App-intro">
-          <button id="create" onClick={this.createGame}>Create New Private Game</button>
-          <input onSubmit={this.joinGame} onChange={this.handleChange} placeholder="Join a Game"/>
-          <button onClick={this.joinGame}>join!</button>
-        </p>
+        {this.renderView()}
       </div>
     );
   }
