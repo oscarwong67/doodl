@@ -21,9 +21,9 @@ io.on('connection', (client) => {
         client.emit('selfLeave', client);   //at this point, we have the ID of the client but not which room it left
     });*/
 
-    client.on('ready', handleReady);
-
-    client.on('unready', handleUnready);
+    client.on('ready', (id, name, key) => {
+        handleReady(client, id, name, key)
+    });
 
     client.on('draw', handleDraw);
 
@@ -48,13 +48,13 @@ function handleCreate(client, name) {
     games.get(key).join(name, client.id);
 
     console.log("now, having the client join the room...");
-    
-    client.emit('selfJoin', client.id, name, key, games.get(key).playerNames); //tell client they've joined
-    io.sockets.in(key).emit('join', name, key, games.get(key).playerNames); //tell everyone they've joined
+
+    client.emit('selfJoin', client.id, name, key, games.get(key).playerArray); //tell client they've joined
+    io.sockets.in(key).emit('join', name, key, games.get(key).playerArray); //tell everyone they've joined
 }
 
 function handleJoin(client, name, key) {
-    if (! games.get(key)) {   //if game key was invalid
+    if (!games.get(key)) {   //if game key was invalid
         client.emit('err', "invalid key");
         return;
     } else if (games.get(key).numPlayers >= 10) {  //if game is full
@@ -69,11 +69,11 @@ function handleJoin(client, name, key) {
     });
     games.get(key).join(name, client.id);
 
-    client.emit('selfJoin', client.id, name, key, games.get(key).playerNames); //tell client they've joined
-    io.sockets.in(key).emit('join', name, key, games.get(key).playerNames); //tell everyone they've joined
+    client.emit('selfJoin', client.id, name, key, games.get(key).playerArray); //tell client they've joined
+    io.sockets.in(key).emit('join', name, key, games.get(key).playerArray); //tell everyone they've joined
 }
 
-function handleLeave(client, id, name, key) {    
+function handleLeave(client, id, name, key) {
     if (games.get(key)) {
         client.leave(key);  //leave the room
         games.get(key).leave(name, id);  //remove player from games object
@@ -82,15 +82,29 @@ function handleLeave(client, id, name, key) {
             return;
         }
         console.log("User " + client.id + " has left room " + key);
-        io.sockets.in(key).emit('leave', name, key, games.get(key).playerNames);    //tell everyone client has left
+        io.sockets.in(key).emit('leave', name, key, games.get(key).playerArray);    //tell everyone client has left
     }
 
 }
 
-function handleReady(name, key) {
+function handleReady(client, id, name, key) {
+    if (games.get(key)) {
+        if (!games.get(key).started) {
+            games.get(key).toggleReady(name, id);
+            io.sockets.in(key).emit('ready', games.get(key).playerArray);
+        }
+        if (games.get(key).allReady && games.get(key).numPlayers > 1) {
+            emitStart(key);
+        }
+    }
 }
 
-function handleUnready(name, key) {
+function emitStart(key) {
+    if (!games.get(key).started) {
+        io.sockets.in(key).emit('start');
+        games.get(key).startGame();
+    }
+    //toDo: frontend "game", then build backend of game
 }
 
 function handleDraw() {
