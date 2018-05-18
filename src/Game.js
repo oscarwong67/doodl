@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
 import { Button, ButtonGroup, Col, Container, ListGroup, ListGroupItem, Row } from 'reactstrap';
-import CanvasDraw from "react-canvas-draw";
+import CanvasDraw from "react-canvas-draw"; //awesome package tbh
 import FontAwesome from 'react-fontawesome';
 
 const styles = {
     containerStyle: {
         backgroundColor: 'white',
-        width: '87.5vw',
+        width: '85vw',
         height: '60vh',
+        display: 'block',
+        overflow: 'auto',
         marginTop: '10vh'
     },
     colStyle: {
         border: '3px solid #9242f4',
         borderRadius: 12,
         height: '60vh',
+        display: 'block',
+        overflow: 'auto',
         paddingLeft: 5,
         paddingRight: 5
     },
@@ -24,7 +28,7 @@ const styles = {
         marginTop: 10
     },
     optionsStyle: {
-        marginTop: 5,
+        marginTop: '0.5em',
         width: '100%',
         overflow: 'hidden',
     },
@@ -121,7 +125,7 @@ class Game extends Component {
                     <Col id="canvas-col" xs="7" style={styles.colStyle}>
                         <CanvasDraw disabled={! this.props.drawing} ref={canvasDraw => (this.canvas = canvasDraw)} style={styles.canvasStyle} brushColor={this.state.color} brushSize={this.state.size} canvasWidth={this.state.canvasWidth} canvasHeight={this.state.canvasHeight} />
                         <Row className="options" style={styles.optionsStyle}>
-                            <Col xs="12" lg="8" style={styles.innerColStyle}>
+                            <Col xs="12" md="8" style={styles.innerColStyle}>
                                 <ButtonGroup size="lg">
                                     <Button className="color" id="white #FFFFFF" style={{ backgroundColor: '#FFFFFF', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
                                     <Button className="color" id="lightGrey #cecece" style={{ backgroundColor: '#cecece', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
@@ -135,7 +139,7 @@ class Game extends Component {
                                     <Button className="color" id="lightBrown #8B4513" style={{ backgroundColor: '#8B4513', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
                                 </ButtonGroup>
                             </Col>
-                            <Col xs="12" lg="4" style={{ paddingLeft: 0, paddingRight: 0 }}>
+                            <Col xs="12" md="4" style={{ paddingLeft: 0, paddingRight: 0 }}>
                                 <ButtonGroup size="lg">
                                     <Button className="utility eraser" id="eraser" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={this.handleColorPick}><p className="text-center eraser"><FontAwesome className="eraser" name="eraser" /></p></Button>
                                     <Button id="undo" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={() => { this.canvas.undo(); }}><p className="text-center undo"><FontAwesome className="undo" name="undo" /></p></Button>
@@ -143,7 +147,7 @@ class Game extends Component {
                             </Col>
                         </Row>
                         <Row className="options" style={styles.optionsStyle}>
-                            <Col xs="12" lg="8" style={styles.innerColStyle}>
+                            <Col xs="12" md="8" style={styles.innerColStyle}>
                                 <ButtonGroup size="lg">
                                     <Button className="color" id="black #000000" style={{ backgroundColor: '#000000', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
                                     <Button className="color" id="darkGrey #4c4c4c" style={{ backgroundColor: '#4c4c4c', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
@@ -157,7 +161,7 @@ class Game extends Component {
                                     <Button className="color" id="peach #ffddb7" style={{ backgroundColor: '#ffddb7', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
                                 </ButtonGroup>
                             </Col>
-                            <Col xs="12" lg="4" style={{ paddingLeft: 0, paddingRight: 0 }}>
+                            <Col xs="12" md="4" style={{ paddingLeft: 0, paddingRight: 0 }}>
                                 <ButtonGroup size="lg">
                                     <Button className="small" id="small" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={this.setSize}><p className="text-center small">&#9679;</p></Button>
                                     <Button className="medium" id="medium" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={this.setSize}><p className="text-center medium">&#11044;</p></Button>
