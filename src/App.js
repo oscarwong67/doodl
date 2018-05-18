@@ -18,7 +18,8 @@ class App extends Component {
       players: [],
       invalidKey: false,
       ableToJoin: false,
-      seconds: 6
+      seconds: 6,
+      currentDrawing: ''
     }
   }
   componentDidMount() {
@@ -50,7 +51,6 @@ class App extends Component {
     socket.on('err', this.handleError);
     socket.emit('join', name, key); //send call to server to join room    
   }
-
   selfJoin = (clientID, name, key, playerArray) => {  //called when the client themselves joins a room
     this.setState({
       id: clientID,
@@ -66,6 +66,7 @@ class App extends Component {
     socket.on('leave', this.handleLeave); //listen for other people leaving
     socket.on('ready', this.handleReady); //listen for other people readying
     socket.on('start', this.startTimer);
+    socket.on('draw', this.handleReceiveDrawing); //listen for other people drawing
   }
   handleJoin = (name, key, playerArray) => {    //called when anyone successfully joins your current room
     //onPlayerJoin - update react stuff so a player "visually" joins    
@@ -110,6 +111,18 @@ class App extends Component {
       view: 'lobby'
     })
   }
+  updateDrawing = (drawing) => {    
+    this.setState({
+      currentDrawing: drawing
+    }, () => {      
+      socket.emit('draw', this.state.currentDrawing, this.state.gameKey);
+    })
+  }
+  handleReceiveDrawing = (drawing) => {
+    this.setState({
+      currentDrawing: drawing
+    });
+  }
   renderView = () => {
     if (this.state.view === 'start') {
       return (<Start view={this.startLobby} invalidKey={this.state.invalidKey} ableToJoin={this.state.ableToJoin} createLobby={this.createLobby} joinLobby={this.joinLobby} />);
@@ -118,7 +131,7 @@ class App extends Component {
       return (<Lobby players={this.state.players} toggleReady={this.toggleReady} id={this.state.id} gameKey={this.state.gameKey} seconds={this.state.seconds} starting={this.state.starting}/>)
     }
     if (this.state.view === 'game') {
-      return (<Game />);
+      return (<Game players={this.state.players} drawing={this.state.name === 'oscar'} updateDrawing={this.updateDrawing} currentDrawing={this.state.currentDrawing} />); //toDo:update this based on who's drawing
     }
   }
   render() {
@@ -128,7 +141,9 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to Doodl</h1>
         </header>
-        {this.renderView()}
+        <div className="view-container">
+          {this.renderView()}
+        </div>        
       </div>
     );
   }

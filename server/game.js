@@ -2,6 +2,7 @@ function Player(name, id) {
     this.name = name;
     this.id = id;
     this.ready = false;
+    this.drawing = false;
 }
 
 module.exports = class Game {
@@ -34,7 +35,6 @@ module.exports = class Game {
         this.playerArray.splice(index, 1);
         this.numPlayers--;
     }
-
     toggleReady(name, id) {
         let index = this.getIndex(name);
         if (this.players.get(id).ready) {
@@ -51,8 +51,15 @@ module.exports = class Game {
             }
         });
     }
+    startDrawing(name, id) {
+        //this is how we'll control who's drawing, by sending the player.drawing boolean to App's state, which will pass it to Game as a prop
+    }
+    stopDrawing(name, id) {
 
+    }
     startGame() {
         this.started = true;
     }
+
+    
 }

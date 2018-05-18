@@ -107,8 +107,8 @@ function emitStart(key) {
     //toDo: frontend "game", then build backend of game
 }
 
-function handleDraw() {
-
+function handleDraw(drawing, key) {
+    io.sockets.in(key).emit('draw', drawing);
 }
 
 function handleMessage() {
