@@ -57,6 +57,7 @@ class Lobby extends Component {
         return (
             <Container style={styles.containerStyle}>
                 <h2 style={styles.headingStyle}>{this.props.starting ? "Game starting in:" : "Waiting for players..."}</h2>
+                <h3>There will be {this.props.rounds} rounds.</h3>
                 {this.props.starting ? this.props.seconds : ("Game Key: " + this.props.gameKey)}
                 {this.renderPlayers()}
             </Container>

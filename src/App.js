@@ -12,14 +12,22 @@ class App extends Component {
     super(props);
     this.state = {
       view: 'game',
+      host: true,
+      drawing: false,
       id: '',
       name: '',
       gameKey: '',
       players: [],
+      rounds: 2,
       invalidKey: false,
       ableToJoin: false,
-      seconds: 6,
-      currentDrawing: ''
+      seconds: 5,
+      currentDrawing: '',
+      roundLength: 80000,
+      timeLeft: 80,
+      currentRound: 0,
+      enabled: true,
+      word: ''
     }
   }
   componentDidMount() {
@@ -27,21 +35,26 @@ class App extends Component {
   }
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.selfLeave);
+    (function (w) { w = w || window; var i = w.setInterval(function () { }, 100000); while (i >= 0) { w.clearInterval(i--); } })(/*window*/);
+    socket.removeAllListeners();
   }
   handleError = (error) => {
     console.log("whoa, an error! error: " + error);
-    if (error.toString() === "invalid key") {
+    if (error.toString() === "invalid key" || error.toString() === "full game" || error.toString === "game in progress") { //temporarily give the same error for both
       this.setState({
         invalidKey: true
       })
     }
   }
-  createLobby = (name) => {
+  createLobby = (name, rounds) => {
+    this.setState({
+      rounds: rounds,
+    })
     //listen for players joining, and errors
     console.log("creating a lobby...");
     socket.on('selfJoin', this.selfJoin); //called when you successfully join
     socket.on('err', this.handleError);
-    socket.emit('create', name);    //send call to server to create room
+    socket.emit('create', name, rounds);    //send call to server to create room
   }
 
   joinLobby = (name, key) => { //call this function when a user clicks the "join game" button
@@ -51,15 +64,20 @@ class App extends Component {
     socket.on('err', this.handleError);
     socket.emit('join', name, key); //send call to server to join room    
   }
-  selfJoin = (clientID, name, key, playerArray) => {  //called when the client themselves joins a room
+  selfJoin = (clientID, name, key, playerArray, rounds, host, drawing) => {  //called when the client themselves joins a room
     this.setState({
+      host: host,
+      drawing: drawing,
       id: clientID,
       name: name,
       gameKey: key,
       players: playerArray,
       invalidKey: false,
       ableToJoin: true,
-      starting: false
+      starting: false,
+      rounds: rounds
+    }, () => {
+
     })
     console.log("You, " + name + " have joined room " + key);
     socket.on('join', this.handleJoin);  //listen for other people joining
@@ -67,16 +85,21 @@ class App extends Component {
     socket.on('ready', this.handleReady); //listen for other people readying
     socket.on('start', this.startTimer);
     socket.on('draw', this.handleReceiveDrawing); //listen for other people drawing
+
+    socket.on('startRound', this.startRound);
+    socket.on('endGame', this.endGame);
+    socket.on('startPlayer', this.startPlayer);
+    socket.on('receiveMessage', this.receiveMessage);
   }
   handleJoin = (name, key, playerArray) => {    //called when anyone successfully joins your current room
     //onPlayerJoin - update react stuff so a player "visually" joins    
     console.log(name + " has joined room " + key);
     this.setState({
       players: playerArray
-    })
+    });
   }
   selfLeave = () => {
-    socket.emit('leave', this.state.id, this.state.name, this.state.gameKey);    
+    socket.emit('leave', this.state.id, this.state.name, this.state.gameKey);
   }
   handleLeave = (name, key, playerArray) => {
     console.log(name + " has left room " + key);
@@ -92,29 +115,76 @@ class App extends Component {
       players: playerArray
     })
   }
-  startTimer = () => {    
-    let interval = window.setInterval(() => {
-      this.setState({
-        seconds: this.state.seconds - 1,
-        starting: true
-      })
-    }, 1000);
-    window.setTimeout(() => {
-      clearInterval(interval);
-      this.setState({
-        view: 'game'
-      }) 
-    }, 6000);
-  }
   startLobby = () => {
     this.setState({
       view: 'lobby'
     })
   }
-  updateDrawing = (drawing) => {    
+  startTimer = () => {
+    this.setState({
+      starting: true
+    });
+    let interval = window.setInterval(() => {
+      this.setState({
+        seconds: this.state.seconds - 1,
+      });
+    }, 1000);
+    window.setTimeout(() => {
+      clearInterval(interval);
+      this.setState({
+        view: 'game'
+      });
+      this.startGame();
+    }, 5000);
+  }
+  startGame = () => {
+    if (this.state.host) {
+      socket.emit('startGame', this.state.gameKey);
+    }
+  }
+  startRound = (round) => {
+    console.log("starting round " + round);
+    this.setState({
+      currentRound: round
+    })
+    if (this.state.host) {
+      socket.emit('startRound', round, this.state.gameKey);
+    }
+  }
+  startPlayer = (i, playerArray, word) => {
+    console.log("currently starting player " + i + "'s turn");
+    let index = this.state.players.map((player) => {
+      return player.name;
+    }).indexOf(this.state.name);
+
+    this.setState({
+      players: playerArray,
+      drawing: playerArray[index].drawing,
+      timeLeft: 80,
+      enabled: true,
+      word: word
+    }, () => {
+
+    });
+    let timer = window.setInterval(() => {
+      this.setState({
+        timeLeft: this.state.timeLeft - 1,
+      })
+    }, 1000);
+    window.setTimeout(() => {
+      this.setState({
+        enabled: false
+      })
+      clearInterval(timer);
+    }, 10000);
+  }
+  endGame = () => {
+    console.log("game over");
+  }
+  updateDrawing = (drawing) => {
     this.setState({
       currentDrawing: drawing
-    }, () => {      
+    }, () => {
       socket.emit('draw', this.state.currentDrawing, this.state.gameKey);
     })
   }
@@ -123,15 +193,21 @@ class App extends Component {
       currentDrawing: drawing
     });
   }
+  sendMessage = (message) => {
+
+  }
+  receiveMessage = (message) => {
+
+  }
   renderView = () => {
     if (this.state.view === 'start') {
       return (<Start view={this.startLobby} invalidKey={this.state.invalidKey} ableToJoin={this.state.ableToJoin} createLobby={this.createLobby} joinLobby={this.joinLobby} />);
     }
     if (this.state.view === 'lobby') {
-      return (<Lobby players={this.state.players} toggleReady={this.toggleReady} id={this.state.id} gameKey={this.state.gameKey} seconds={this.state.seconds} starting={this.state.starting}/>)
+      return (<Lobby players={this.state.players} toggleReady={this.toggleReady} id={this.state.id} gameKey={this.state.gameKey} rounds={this.state.rounds} seconds={this.state.seconds} starting={this.state.starting} />)
     }
     if (this.state.view === 'game') {
-      return (<Game players={this.state.players} drawing={this.state.name === 'oscar'} updateDrawing={this.updateDrawing} currentDrawing={this.state.currentDrawing} />); //toDo:update this based on who's drawing
+      return (<Game players={this.state.players} word={this.state.word} enabled={this.state.enabled} timeLeft={this.state.timeLeft} rounds={this.state.rounds} currentRound={this.state.currentRound} drawing={this.state.drawing} updateDrawing={this.updateDrawing} currentDrawing={this.state.currentDrawing} />); //toDo:update this based on who's drawing
     }
   }
   render() {
@@ -143,7 +219,7 @@ class App extends Component {
         </header>
         <div className="view-container">
           {this.renderView()}
-        </div>        
+        </div>
       </div>
     );
   }

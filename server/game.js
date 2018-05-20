@@ -3,6 +3,7 @@ function Player(name, id) {
     this.id = id;
     this.ready = false;
     this.drawing = false;
+    this.score = 0;
 }
 
 module.exports = class Game {
@@ -13,6 +14,11 @@ module.exports = class Game {
         this.playerArray = [];
         this.allReady = false;
         this.started = false;
+        this.rounds = 2;
+        this.currentRound = 1;
+    }
+    setRounds(rounds) {
+        this.rounds = rounds;
     }
     getIndex(name) {
         let index = this.playerArray.map((player) => {
@@ -20,7 +26,6 @@ module.exports = class Game {
         }).indexOf(name);
         return index;
     }
-
     join(name, id) {
         let temp = new Player(name, id);
         this.numPlayers++;
@@ -28,7 +33,6 @@ module.exports = class Game {
         this.playerArray.push(temp);
         return temp.id;
     }
-
     leave(name, id) {
         let index = this.getIndex(name);
         this.players.delete(id);
@@ -52,13 +56,27 @@ module.exports = class Game {
         });
     }
     startDrawing(name, id) {
-        //this is how we'll control who's drawing, by sending the player.drawing boolean to App's state, which will pass it to Game as a prop
+        let index = this.getIndex(name);
+        this.players.get(id).drawing = true;
+        this.playerArray[index].drawing = true;
     }
     stopDrawing(name, id) {
 
     }
     startGame() {
         this.started = true;
+    }
+    startPlayer(playerIndex) {   //runs once for each player in each round
+        for (let i = 0; i < this.playerArray.length; i++) {
+            this.playerArray[i].drawing = false;
+            this.players.get(this.playerArray[i].id).drawing = false;
+        }
+        let id = this.playerArray[playerIndex].id;
+        this.playerArray[playerIndex].drawing = true;
+        this.players.get(id).drawing = true;
+    }
+    startRound(round) {
+        this.currentRound = round;
     }
 
     
