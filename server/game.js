@@ -3,19 +3,22 @@ function Player(name, id) {
     this.id = id;
     this.ready = false;
     this.drawing = false;
-    this.score = 0;
+    this.points = 0;
 }
 
 module.exports = class Game {
     constructor(key) {
         this.key = key;
         this.numPlayers = 0;
+        this.guessedPlayers = 0; //number of players who've guessed
         this.players = new Map();
         this.playerArray = [];
         this.allReady = false;
         this.started = false;
         this.rounds = 2;
         this.currentRound = 1;
+        this.currentPlayer = 0;
+        this.word = "";
     }
     setRounds(rounds) {
         this.rounds = rounds;
@@ -67,6 +70,11 @@ module.exports = class Game {
         this.started = true;
     }
     startPlayer(playerIndex) {   //runs once for each player in each round
+        if (playerIndex < 0 || playerIndex > (this.numPlayers - 1)) {
+            return;
+        }
+        this.currentPlayer = playerIndex;
+        this.guessedPlayers = 0; //0 players have guessed every time a new one starts
         for (let i = 0; i < this.playerArray.length; i++) {
             this.playerArray[i].drawing = false;
             this.players.get(this.playerArray[i].id).drawing = false;
@@ -77,6 +85,17 @@ module.exports = class Game {
     }
     startRound(round) {
         this.currentRound = round;
+    }
+    setWord(word) {
+        this.word = word;
+    }
+    successGuess() {
+        this.guessedPlayers++;
+    }
+    addPoints(name, id, points) {
+        let index = this.getIndex(name);
+        this.players.get(id).points += points;
+        this.playerArray[index].points += points;
     }
 
     

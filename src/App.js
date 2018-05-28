@@ -11,7 +11,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: 'game',
+      view: 'start',
       host: true,
       drawing: false,
       id: '',
@@ -27,7 +27,9 @@ class App extends Component {
       timeLeft: 80,
       currentRound: 0,
       enabled: true,
-      word: ''
+      word: '',
+      messages: [],
+      guessed: false
     }
   }
   componentDidMount() {
@@ -90,6 +92,8 @@ class App extends Component {
     socket.on('endGame', this.endGame);
     socket.on('startPlayer', this.startPlayer);
     socket.on('receiveMessage', this.receiveMessage);
+    socket.on('serverMessage', this.handleServerMessage);
+    socket.on('guessed', this.handleGuessed);
   }
   handleJoin = (name, key, playerArray) => {    //called when anyone successfully joins your current room
     //onPlayerJoin - update react stuff so a player "visually" joins    
@@ -162,7 +166,8 @@ class App extends Component {
       drawing: playerArray[index].drawing,
       timeLeft: 80,
       enabled: true,
-      word: word
+      word: word,
+      guessed: false
     }, () => {
 
     });
@@ -171,12 +176,22 @@ class App extends Component {
         timeLeft: this.state.timeLeft - 1,
       })
     }, 1000);
-    window.setTimeout(() => {
+    let timeout = window.setTimeout(() => {
       this.setState({
         enabled: false
       })
       clearInterval(timer);
     }, 10000);
+    socket.on('skip', () => {
+      clearInterval(timer);
+      clearTimeout(timeout);
+      this.setState({
+        timeLeft: 0,
+        enabled: false
+      }, () => {
+        
+      });      
+    });
   }
   endGame = () => {
     console.log("game over");
@@ -194,10 +209,33 @@ class App extends Component {
     });
   }
   sendMessage = (message) => {
-
+    if (! this.state.guessed) {
+      console.log(message);
+      socket.emit('message', message, this.state.gameKey, this.state.timeLeft, this.state.id);
+    }
   }
-  receiveMessage = (message) => {
+  receiveMessage = (message, sender) => {
+    let messageObj = {
+      message: message,
+      sender: sender
+    }
+    this.setState({
+      messages: [...this.state.messages, messageObj]
+    })
+  }
+  handleServerMessage = (guesser, playerArray) => {
+    this.setState({
+      players: playerArray
+    }, () => {
 
+    })
+    let message = guesser + " has guessed the word!";
+    this.receiveMessage(message, "Server");
+  }
+  handleGuessed = () => {
+    this.setState({
+      guessed: true
+    })
   }
   renderView = () => {
     if (this.state.view === 'start') {
@@ -207,7 +245,7 @@ class App extends Component {
       return (<Lobby players={this.state.players} toggleReady={this.toggleReady} id={this.state.id} gameKey={this.state.gameKey} rounds={this.state.rounds} seconds={this.state.seconds} starting={this.state.starting} />)
     }
     if (this.state.view === 'game') {
-      return (<Game players={this.state.players} word={this.state.word} enabled={this.state.enabled} timeLeft={this.state.timeLeft} rounds={this.state.rounds} currentRound={this.state.currentRound} drawing={this.state.drawing} updateDrawing={this.updateDrawing} currentDrawing={this.state.currentDrawing} />); //toDo:update this based on who's drawing
+      return (<Game players={this.state.players} messages={this.state.messages} sendGuess={this.sendMessage} word={this.state.word} enabled={this.state.enabled} timeLeft={this.state.timeLeft} rounds={this.state.rounds} currentRound={this.state.currentRound} drawing={this.state.drawing} updateDrawing={this.updateDrawing} currentDrawing={this.state.currentDrawing} />); //toDo:update this based on who's drawing
     }
   }
   render() {

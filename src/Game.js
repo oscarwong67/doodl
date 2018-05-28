@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, ButtonGroup, Col, Container, Input, InputGroup, InputGroupAddon, ListGroup, ListGroupItem, Row } from 'reactstrap';
 import CanvasDraw from "react-canvas-draw"; //awesome package tbh
 import FontAwesome from 'react-fontawesome';
+import StayScrolled from 'react-stay-scrolled';
 
 const styles = {
     containerStyle: {
@@ -41,6 +42,22 @@ const styles = {
         paddingBottom: 0,
         paddingLeft: 0
     },
+    chatStyle: {
+        border: '3px solid #9242f4',
+        borderRadius: 12,
+        height: '60vh',
+        display: 'block',
+        overflow: 'auto',
+        paddingLeft: 5,
+        paddingRight: 5,
+        position: 'relative'
+    },
+    chatInputGroupStyle: {
+        position: 'absolute',
+        bottom: 0,
+        width: '95%'
+        
+    },
     chatInputStyle: {
         fontSize: '0.8rem'
     }
@@ -61,7 +78,8 @@ class Game extends Component {
             canvasHeight: 500,
             canvasWidth: 650,
             color: '#9242f4',
-            size: 6
+            size: 6,
+            guess: ''
         }
     }
     componentWillReceiveProps(nextProps) {
@@ -171,8 +189,22 @@ class Game extends Component {
             </ListGroup>
         );
     }
+    handleInput = (e) => {
+        this.setState({
+            guess: e.target.value
+        });
+    }
+    handleKeyPress = (e) => {
+        if (e.key === "Enter" && this.props.timeLeft > 0) {
+            this.sendGuess();
+        }
+    }
     sendGuess = () => {
-
+        //set guess back to blank, send message as guess first
+        this.props.sendGuess(this.state.guess);
+        this.setState({
+            guess: ''
+        });
     }
     getCanvas = () => {
         if (this.props.enabled) {
@@ -284,6 +316,28 @@ class Game extends Component {
             );
         }
     }
+    getChat = () => {
+        let messages = [];
+        for (let i = 0; i < this.props.messages.length; i++) {
+            let key = "message " + i;
+            messages.push(
+                <Row key={key}>
+                    <Col xs="12">
+                        <ListGroupItem key={i} style={styles.listGroupItemStyle}>
+                            <p style={{fontSize:'0.75rem'}}>{this.props.messages[i].sender}: {this.props.messages[i].message}</p>
+                        </ListGroupItem>
+                    </Col>
+                </Row>
+            );
+        }
+        return (
+            <StayScrolled component="div">
+                <ListGroup>
+                    {messages}
+                </ListGroup>
+            </StayScrolled>
+        );
+    }
     render() {
         return (
             <div>
@@ -295,10 +349,11 @@ class Game extends Component {
                             {this.renderPlayers()}
                         </Col>
                         {this.getCanvas()}
-                        <Col id="chat" xs="3" style={styles.colStyle}>
-                            <InputGroup>
-                                <Input placeholder="Enter a guess" onKeyPress={this.submitGuess} ref={Button => (this.sendButton = Button)} style={styles.chatInputStyle}/>
-                                <InputGroupAddon addonType="append"><Button color="secondary" size="sm" onClick={this.submitGuess}>Send</Button></InputGroupAddon>
+                        <Col id="chat" xs="3" style={styles.chatStyle}>
+                            {/*{this.getChat()}*/}
+                            <InputGroup style={styles.chatInputGroupStyle}>
+                                <Input placeholder="Enter a guess" onKeyPress={this.handleKeyPress} onChange={this.handleInput} ref={Button => (this.sendButton = Button)} style={styles.chatInputStyle}/>
+                                <InputGroupAddon addonType="append"><Button color="secondary" size="sm" onClick={this.sendGuess}>Send</Button></InputGroupAddon>
                             </InputGroup>
                         </Col>
                     </Row>
