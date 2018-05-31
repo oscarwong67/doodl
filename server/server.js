@@ -134,7 +134,6 @@ function handleStartRound(round, key) {
             io.sockets.in(key).emit('endGame');
             return;
         }
-        //toDo: compile scores from previous round
         games.get(key).startRound(round);
 
         //run once first
@@ -193,7 +192,7 @@ const roundTimeout = (function () {
 function handleStartPlayer(i, key) {
     let word = words[Math.floor(Math.random() * words.length)];
     games.get(key).setWord(word);
-    games.get(key).startPlayer(i); //toDo: on this call, generate and send a new word
+    games.get(key).startPlayer(i);
     io.sockets.in(key).emit('startPlayer', i, games.get(key).playerArray, word);
     if (i == 1 && games.get(key).currentRound == 2) {
         console.log('yo');

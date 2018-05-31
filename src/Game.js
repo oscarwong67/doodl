@@ -195,16 +195,18 @@ class Game extends Component {
         });
     }
     handleKeyPress = (e) => {
-        if (e.key === "Enter" && this.props.timeLeft > 0) {
+        if (e.key === "Enter" && this.props.timeLeft > 0 && this.props.enabled) {
             this.sendGuess();
         }
     }
     sendGuess = () => {
         //set guess back to blank, send message as guess first
-        this.props.sendGuess(this.state.guess);
-        this.setState({
-            guess: ''
-        });
+        if (this.props.timeLeft > 0 && this.props.enabled) {
+            this.props.sendGuess(this.state.guess);
+            this.setState({
+                guess: ''
+            });
+        }
     }
     getCanvas = () => {
         if (this.props.enabled) {
