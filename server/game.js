@@ -17,7 +17,7 @@ module.exports = class Game {
         this.started = false;
         this.rounds = 2;
         this.currentRound = 1;
-        this.currentPlayer = 0;
+        this.currentPlayer = 0; //index of current drawing player
         this.word = "";
     }
     setRounds(rounds) {
@@ -94,6 +94,11 @@ module.exports = class Game {
     }
     addPoints(name, id, points) {
         let index = this.getIndex(name);
+        this.players.get(id).points += points;
+        this.playerArray[index].points += points;
+    }
+    addDrawerPoints(index, points) {
+        let id = this.playerArray[index].id;
         this.players.get(id).points += points;
         this.playerArray[index].points += points;
     }

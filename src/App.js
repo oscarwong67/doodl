@@ -151,7 +151,7 @@ class App extends Component {
     this.setState({
       currentRound: round
     })
-    if (this.state.host) {
+    if (this.state.host) {      
       socket.emit('startRound', round, this.state.gameKey);
     }
   }

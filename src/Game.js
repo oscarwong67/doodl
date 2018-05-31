@@ -175,8 +175,8 @@ class Game extends Component {
                     <Row key={this.props.players[i].id}>
                         <Col xs="12">
                             <ListGroupItem key={i} style={styles.listGroupItemStyle}>
-                                <p>{this.props.players[i].name}</p>
-                                <p>Score: {this.props.players[i].score}</p>
+                                <p style={{margin: '0 0 0 0', border: 'none', padding: '0 0 0 0'}}>{this.props.players[i].name}</p>
+                                <p style={{ margin: '0 0 0 0', border: 'none', padding: '0 0 0 0' }}>Score: {this.props.players[i].points}</p>
                             </ListGroupItem>
                         </Col>
                     </Row>
@@ -273,7 +273,7 @@ class Game extends Component {
 
             //create list of players again
             let playerElements = [];
-            let players = this.props.players;
+            let players = Array.from(this.props.players);
             players.sort(compare);
             if (this.props.players) {
                 for (let i = 0; i < players.length; i++) {
@@ -282,7 +282,7 @@ class Game extends Component {
                             <Col xs="12">
                                 <ListGroupItem key={i} style={styles.listGroupItemStyle}>
                                     <p>{players[i].name}</p>
-                                    <p>Score: {players[i].score}</p>
+                                    <p>Score: {players[i].points}</p>
                                 </ListGroupItem>
                             </Col>
                         </Row>
@@ -350,9 +350,9 @@ class Game extends Component {
                         </Col>
                         {this.getCanvas()}
                         <Col id="chat" xs="3" style={styles.chatStyle}>
-                            {/*{this.getChat()}*/}
+                            {this.getChat()}
                             <InputGroup style={styles.chatInputGroupStyle}>
-                                <Input placeholder="Enter a guess" onKeyPress={this.handleKeyPress} onChange={this.handleInput} ref={Button => (this.sendButton = Button)} style={styles.chatInputStyle}/>
+                                <Input placeholder="Enter a guess" onKeyPress={this.handleKeyPress} onChange={this.handleInput} ref={Button => (this.sendButton = Button)} style={styles.chatInputStyle} disabled={this.props.drawing}/>
                                 <InputGroupAddon addonType="append"><Button color="secondary" size="sm" onClick={this.sendGuess}>Send</Button></InputGroupAddon>
                             </InputGroup>
                         </Col>

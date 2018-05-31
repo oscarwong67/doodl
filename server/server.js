@@ -91,10 +91,10 @@ function handleLeave(client, id, name, key) {
     if (games.get(key)) {
         client.leave(key);  //leave the room
         games.get(key).leave(name, id);  //remove player from games object
-        if (games.get(key).numPlayers == 0) { //if no players remaining, delete room from list of games
+        if (games.get(key).numPlayers === 0) { //if no players remaining, delete room from list of games
             games.delete(key);
             clearInterval(playerIntervalFunc.get());
-            clearTimeout(timeOutFunc.get());
+            clearTimeout(roundTimeout.get());
             return;
         }
         console.log("User " + client.id + " has left room " + key);
@@ -141,7 +141,7 @@ function handleStartRound(round, key) {
         handleStartPlayer(0, key);
         //repeat for rest of players
         playerIntervalFunc.set(key, round);
-        timeOutFunc.set(key, round);
+        roundTimeout.set(key, round);
     }
 }
 
@@ -158,8 +158,8 @@ const playerIntervalFunc = (function () {
                     if (games.get(key).currentPlayer < (games.get(key).numPlayers - 1)) {
                         handleStartPlayer(games.get(key).currentPlayer + 1, key);
                     } else {
-                        if (timeOutFunc.get()) {
-                            clearTimeout(timeOutFunc.get());
+                        if (roundTimeout.get()) {
+                            clearTimeout(roundTimeout.get());
                         }
                         clearInterval(playerInterval);
                         io.sockets.in(key).emit('startRound', round + 1);
@@ -174,7 +174,7 @@ const playerIntervalFunc = (function () {
 
 })();
 
-const timeOutFunc = (function () {
+const roundTimeout = (function () {
     let timeOut;
     return {
         set: function (key, round) {
@@ -210,16 +210,19 @@ function handleMessage(client, message, key, timeLeft, id) {
         if (message.toUpperCase() === word) {
             let points = (13 - games.get(key).guessedPlayers) * 200;
             games.get(key).successGuess();
-            //games.get(key).addPoints(games.get(key).players.get(id).name, id, points);
-            //io.sockets.in(key).emit('serverMessage', games.get(key).players.get(id).name, games.get(key).playerArray);
-            //client.emit('guessed');
+            games.get(key).addPoints(games.get(key).players.get(id).name, id, points);
+            games.get(key).addDrawerPoints(games.get(key).currentPlayer, points / 10);
+            io.sockets.in(key).emit('serverMessage', games.get(key).players.get(id).name, games.get(key).playerArray);
+            client.emit('guessed');
             //if everyone guesses...
             if (games.get(key).guessedPlayers === (games.get(key).numPlayers) - 1) {
                 io.sockets.in(key).emit('skip');
-                let timeOut = setTimeout(() => {
+                if (games.get(key).guessedPlayers === (games.get(key).numPlayers - 1)) {                    
+                    clearInterval(playerIntervalFunc.get());
+                }
+                let timeOut = setTimeout(() => {    //toDo: move this to a function
                     if (games.get(key).currentPlayer === (games.get(key).numPlayers - 1)) {
-                        clearTimeout(timeOutFunc.get());
-                        clearInterval(playerIntervalFunc.get());
+                        clearTimeout(roundTimeout.get());
                         io.sockets.in(key).emit('startRound', games.get(key).currentRound + 1);
                     } else {
                         handleStartPlayer(games.get(key).currentPlayer + 1, key);
