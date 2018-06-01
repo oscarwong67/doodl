@@ -5,7 +5,7 @@ import Start from './Start';
 import Lobby from './Lobby';
 import Game from './Game';
 import openSocket from 'socket.io-client';
-const socket = openSocket('https://doodl.herokuapp.com:8000');
+const socket = openSocket('https://doodl.herokuapp.com');
 
 class App extends Component {
   constructor(props) {
