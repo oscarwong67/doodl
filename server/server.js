@@ -1,5 +1,5 @@
 const io = require('socket.io')(8080, {
-    origins: ["http://localhost:3000", "https://oscarwong67.github.io"]
+    origins: ["http://localhost:3000", "https://oscarwong67.github.io/doodl"]
 });
 const randomString = require('random-base64-string');
 const Game = require('./game.js');
