@@ -181,7 +181,7 @@ class App extends Component {
         enabled: false
       })
       clearInterval(timer);
-    }, 10000);
+    }, 85000);
     socket.on('skip', () => {
       clearInterval(timer);
       clearTimeout(timeout);

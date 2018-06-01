@@ -53,7 +53,9 @@ const styles = {
         position: 'relative'
     },
     chatInputGroupStyle: {
-        position: 'absolute',
+        position: '-webkit - sticky',
+        position: 'sticky',
+        top: '95%',
         bottom: 0,
         width: '95%'
         
@@ -64,7 +66,7 @@ const styles = {
 }
 
 function compare(a, b) {
-    if (a.score >= b.score) {
+    if (a.score <= b.score) {
         return -1;
     } else {
         return 1;

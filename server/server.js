@@ -164,7 +164,7 @@ const playerIntervalFunc = (function () {
                         io.sockets.in(key).emit('startRound', round + 1);
                     }
                 }
-            }, 15000);  //every 85 seconds, go to the next player
+            }, 85000);  //every 85 seconds, go to the next player
         },
         get: function () {
             return playerInterval;
@@ -177,7 +177,7 @@ const roundTimeout = (function () {
     let timeOut;
     return {
         set: function (key, round) {
-            let total = 15000 * games.get(key).numPlayers;
+            let total = 85000 * games.get(key).numPlayers;
             timeOut = setTimeout(() => {
                 clearInterval(playerIntervalFunc.get());
                 io.sockets.in(key).emit('startRound', round + 1);
