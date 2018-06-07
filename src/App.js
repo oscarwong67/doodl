@@ -5,7 +5,7 @@ import Start from './Start';
 import Lobby from './Lobby';
 import Game from './Game';
 import openSocket from 'socket.io-client';
-const socket = openSocket('https://doodl.herokuapp.com'); //localhost:8000
+const socket = openSocket('localhost:8000'); //https://doodl.herokuapp.com
 
 class App extends Component {
   constructor(props) {
@@ -37,7 +37,7 @@ class App extends Component {
   }
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.selfLeave);
-    (function (w) { w = w || window; var i = w.setInterval(function () { }, 100000); while (i >= 0) { w.clearInterval(i--); } })(/*window*/);
+    (function (w) { w = w || window; var i = w.setInterval(function () { }, 100000); while (i >= 0) { w.clearInterval(i--); } })(/*window*/); //clear all intervals
     socket.removeAllListeners();
   }
   handleError = (error) => {
@@ -91,6 +91,7 @@ class App extends Component {
     socket.on('startRound', this.startRound);
     socket.on('endGame', this.endGame);
     socket.on('startPlayer', this.startPlayer);
+    socket.on('interval', this.receiveInterval);
     socket.on('receiveMessage', this.receiveMessage);
     socket.on('serverMessage', this.handleServerMessage);
     socket.on('guessed', this.handleGuessed);
@@ -168,29 +169,24 @@ class App extends Component {
       enabled: true,
       word: word,
       guessed: false
-    }, () => {
-
     });
-    let timer = window.setInterval(() => {
-      this.setState({
-        timeLeft: this.state.timeLeft - 1,
-      })
-    }, 1000);
-    let timeout = window.setTimeout(() => {
-      this.setState({
-        enabled: false
-      })
-      clearInterval(timer);
-    }, 85000);
     socket.on('skip', () => {
-      clearInterval(timer);
-      clearTimeout(timeout);
       this.setState({
         timeLeft: 0,
         enabled: false
-      }, () => {
-        
-      });      
+      });    
+    });
+
+  }
+  receiveInterval = (serverTimeLeft) => {
+    this.setState({
+      timeLeft: serverTimeLeft - 5,
+    }, () => {
+      if (serverTimeLeft <= 5) {
+        this.setState({
+          enabled: false
+        });
+      }
     });
   }
   endGame = () => {
