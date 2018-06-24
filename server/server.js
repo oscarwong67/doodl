@@ -3,9 +3,11 @@ const io = require('socket.io')();
 io.origins('*:*');
 const randomString = require('random-base64-string');
 const Game = require('./game.js');
-let words = ["CD", "AXE", "BOW", "BOY", "CAR", "ELF", "EYE", "FAT", "KEY", "OWL", "PEN", "PIG", "RUG", "SEA", "SUN", "ANTS", "BABY", "BANK", "BARN", "BEER", "BIKE", "BIRD", "BOAT", "BOMB", "BOOK", "BOWL", "BURN", "CAKE", "CHEF", "COLD", "CRAB", "CORK", "DESK", "DICE", "DUCK", "EGGS", "FACE", "FALL", "FARM", "FLAG", "FIRE", "FROG", "GIFT", "GIRL", "HAIR", "HAND", "HANG", "HOOK", "JAIL", "JUMP", "KING", "KISS", "HOBO", "LAKE", "LAMP", "LAVA", "LION", "LOVE", "MATH", "MOON", "NECK", "POOL", "POOP", "PULL", "PUSH", "RAIN", "RICE", "RING", "ROLL", "ROPE", "ROSE", "SHIP", "SHOE", "SNOW", "SOCK", "SOUP", "TACO", "TANK", "TAIL", "TENT", "TIME", "TINY", "TREE", "WIND", "WOLF", "WARM", "XBOX", "YAWN", "ACORN", "ALIEN", "ANGEL", "ANKEL", "ANVIL", "APPLE", "ARMOR", "BACON", "BAGEL", "BEACH", "BEANS", "BEARD", "BENCH", "BERRY", "BLOOD", "BOOTS", "BOOTY", "BREAD", "BRUSH", "CAMEL", "CANDY", "CEREAL", "CHAIR", "CHEEK", "CHEST", "CLOCK", "CLOUD", "CLOWN", "COMET", "COUCH", "CROWD", "CROWN", "DANCE", "DARTS", "DISCO", "DONUT", "DREAM", "DRESS", "DRILL", "DRINK", "DROOL", "DRUMS", "EARTH", "ELBOW", "ERUPT", "FLINT", "FRIES", "GIANT", "GOLEM", "GRASS", "GRAVE", "GUARD", "HIPPO", "HORSE", "IGLOO", "JOKER", "KIRBY", "LEASH", "LIGHT", "LLAMA", "LUIGI", "MAGIC", "MARIO", "MELON", "MINER", "MONEY", "MOOSE", "MOUSE", "MOVIE", "MUSIC", "NIGHT", "NINJA", "OCEAN", "PAINT", "PANDA", "PANTS", "PAPER", "PARTY", "PEPSI", "PHONE", "PHOTO", "PIANO", "PIZZA", "PLANE", "PLANT", "PRIZE", "PUNCH", "PUPPY", "PURSE", "QUEEN", "QUICK", "RADAR", "RIFLE", "RIVER", "ROBOT", "ROYAL", "RULER", "SALAD", "SALSA", "SCARF", "SCREW", "SHARK", "SHEEP", "SHOUT", "SKIRT", "SKULL", "SKUNK", "SKYPE", "SLIME", "SLOTH", "SMILE", "SNAIL", "SNAKE", "SPOON", "SPRAY", "SQUID", "STAIN", "STAMP", "STARS", "STOOL", "STORM", "STUMP", "SUGAR", "SUSHI", "SWING", "SYRUP", "TEARS", "TEDDY", "THIEF", "THORN", "THUMB", "TIGER", "TOOTH", "TORCH", "TOWEL", "TOWER", "TRASH", "TRUCK", "VOMIT", "WAGON", "WAIST", "WATCH", "WATER", "WHALE", "WHEAT", "WITCH", "YOSHI", "ZEBRA", "ARCHER", "ANCHOR", "AUTUMN", "BAMBOO", "BANANA", "BARBIE", "BATMAN", "BIKINI", "BOOGER", "BOTTLE", "BRANCH", "BRIDGE", "BUCKET", "BURGER", "BUTTON", "CACTUS", "CAMERA", "CARROT", "CASTLE", "CHEESE", "CINEMA", "COOKIE", "COFFEE", "CRAYON", "CRYING", "DESERT", "DOMINO", "DRAGON", "FAMILY", "FINGER", "FLOWER", "FOREST", "FROZEN", "GALAXY", "GRAPES", "GUITAR", "HAMMER", "HOTDOG", "JUGGLE", "LAPTOP", "LETTER", "LIZARD", "MONKEY", "MOTHER", "MUDKIP", "MUFFIN", "NETHER", "ORANGE", "PENCIL", "PICNIC", "PICKLE", "PILLOW", "PIRATE", "PISTON", "PLANET", "POLICE", "PORTAL", "PRISON", "RABBIT", "SCHOOL", "SHIELD", "SHORTS", "SKINNY", "SPIDER", "SPIKES", "SPONGE", "SPRING", "SPROUT", "STABLE", "SUMMER", "SUNSET", "TEAPOT", "TEMPLE", "TENNIS", "TETRIS", "TOILET", "TOMATO", "TWITTER", "TURTLE", "WINDOW", "WINTER", "WITHER", "WIZARD", "ZIPPER", "ZOMBIE", "ALCOHOL", "AMERICA", "BAGGAGE", "BATTERY", "BLANKET", "CAPTURE", "CHICKEN", "COCONUT", "COMPASS", "CHICKEN", "CHIMNEY", "CREEPER", "CUPCAKE", "CYCLOPS", "DOLPHIN", "FRISBEE", "FISHING", "FOOTBALL", "FRISBEE", "GARBAGE", "GIRAFFE", "GLASSES", "HAMSTER", "ICEBERG", "MANSION", "MONITOR", "MUSCLES", "NOODLES", "PANCAKE", "PEASANT", "PENGUIN", "PIKACHU", "PLUMBER", "PRESENT", "PYRAMID", "PUMPKIN", "RAINBOW", "RUBBISH", "SHOTGUN", "SNORLAX", "SNOWMAN", "SPEAKER", "STOMACH", "SUNRISE", "TOASTER", "TORNADO", "TRUMPET", "UNICORN", "VOLCANO", "YELLING", "BALLOONS", "BOOKCASE", "BUILDING", "CAMPFIRE", "CANNIBAL", "COMPUTER", "CONFUSED", "DIAMONDS", "DINOSAUR", "ELEPHANT", "EMERALDS", "EYEPATCH", "FACEBOOK", "FIGHTING", "FOOTBALL", "GODZILLA", "KANGAROO", "KEYBOARD", "LOLLIPOP", "MINEPLEX", "MOUNTAIN", "MUSHROOM", "NINTENDO", "NOTEBOOK", "PAINTING", "POKEBALL", "PREGNANT", "PRINCESS", "SKELETON", "SLEEPING", "SLIPPERS", "SQUIRREL", "SUPERMAN", "SWIMMING", "UMBRELLA", "UPPERCUT", "WINDMILL", "ALLIGATOR", "ASTRONAUT", "BUMBLEBEE", "BUTTERFLY", "CHOCOLATE", "EXPLOSION", "HANDCUFFS", "LETTERBOX", "LIGHTNING", "MICROSOFT", "MINECRAFT", "MOTORBIKE", "RASPBERRY", "SIDEBURNS", "SNOWFLAKE", "SPACESHIP", "SPAGHETTI", "STAIRCASE", "TREEHOUSE", "BASKETBALL", "BINOCULARS", "CALCULATOR", "CHARMANDER", "CHESTPLATE", "HELICOPTER", "PLAYSTATION", "TELEVISION", "STRAWBERRY", "SUNGLASSES", "WATERMELON", "BELLY BUTTON", "CAMP FIRE", "CHRISTMAS TREE", "DOOR KNOB", "DRAW MY THING", "ENDER DRAGON", "FISHING ROD", "GOLF CLUB", "GRIM REAPER", "HARRY POTTER", "HOLDING HANDS", "HORSE RIDING", "HOT AIR BALLOON", "ICE CREAM", "IRON ORE", "MOUNTAIN BIKE", "NIGHT TIME", "POT OF GOLD", "PUMPKIN PIE", "SALT AND PEPPER", "SHAKING HANDS", "STOP SIGN", "SWIMMING POOL", "TENNIS RACKET", "TRAFFIC LIGHTS", "TROLL FACE", "TOP HAT", "UNITED STATES", "VIDEO GAME", "WATER GUN", "ZOMBIE PIGMAN"
+const DrawInterval = require('./drawInterval.js');
+let words = ["CD", "AXE", "BOW", "BOY", "CAR", "ELF", "EYE", "FAT", "KEY", "OWL", "PEN", "PIG", "RUG", "SEA", "SUN", "ANTS", "BABY", "BANK", "BARN", "BEER", "BIKE", "BIRD", "BOAT", "BOMB", "BOOK", "BOWL", "BURN", "CAKE", "CHEF", "COLD", "CRAB", "CORK", "DESK", "DICE", "DUCK", "EGGS", "FACE", "FALL", "FARM", "FLAG", "FIRE", "FROG", "GIFT", "GIRL", "HAIR", "HAND", "HANG", "HOOK", "JAIL", "JUMP", "KING", "KISS", "HOBO", "LAKE", "LAMP", "LAVA", "LION", "LOVE", "MATH", "MOON", "NECK", "POOL", "POOP", "PULL", "PUSH", "RAIN", "RICE", "RING", "ROLL", "ROPE", "ROSE", "SHIP", "SHOE", "SNOW", "SOCK", "SOUP", "TACO", "TANK", "TAIL", "TENT", "TIME", "TINY", "TREE", "WIND", "WOLF", "WARM", "XBOX", "YAWN", "ACORN", "ALIEN", "ANGEL", "ANKEL", "ANVIL", "APPLE", "ARMOR", "BACON", "BAGEL", "BEACH", "BEANS", "BEARD", "BENCH", "BERRY", "BLOOD", "BOOTS", "BOOTY", "BREAD", "BRUSH", "CAMEL", "CANDY", "CEREAL", "CHAIR", "CHEEK", "CHEST", "CLOCK", "CLOUD", "CLOWN", "COMET", "COUCH", "CROWD", "CROWN", "DANCE", "DARTS", "DISCO", "DONUT", "DREAM", "DRESS", "DRILL", "DRINK", "DROOL", "DRUMS", "EARTH", "ELBOW", "ERUPT", "FLINT", "FRIES", "GIANT", "GOLEM", "GRASS", "GRAVE", "GUARD", "HIPPO", "HORSE", "IGLOO", "JOKER", "KIRBY", "LEASH", "LIGHT", "LLAMA", "LUIGI", "MAGIC", "MARIO", "MELON", "MINER", "MONEY", "MOOSE", "MOUSE", "MOVIE", "MUSIC", "NIGHT", "NINJA", "OCEAN", "PAINT", "PANDA", "PANTS", "PAPER", "PARTY", "PEPSI", "PHONE", "PHOTO", "PIANO", "PIZZA", "PLANE", "PLANT", "PRIZE", "PUNCH", "PUPPY", "PURSE", "QUEEN", "QUICK", "RADAR", "RIFLE", "RIVER", "ROBOT", "ROYAL", "RULER", "SALAD", "SALSA", "SCARF", "SCREW", "SHARK", "SHEEP", "SHOUT", "SKIRT", "SKULL", "SKUNK", "SKYPE", "SLIME", "SLOTH", "SMILE", "SNAIL", "SNAKE", "SPOON", "SPRAY", "SQUID", "STAIN", "STAMP", "STARS", "STOOL", "STORM", "STUMP", "SUGAR", "SUSHI", "SWING", "SYRUP", "TEARS", "TEDDY", "THIEF", "THORN", "THUMB", "TIGER", "TOOTH", "TORCH", "TOWEL", "TOWER", "TRASH", "TRUCK", "VOMIT", "WAGON", "WAIST", "WATCH", "WATER", "WHALE", "WHEAT", "WITCH", "YOSHI", "ZEBRA", "ARCHER", "ANCHOR", "AUTUMN", "BAMBOO", "BANANA", "BARBIE", "BATMAN", "BIKINI", "BOOGER", "BOTTLE", "BRANCH", "BRIDGE", "BUCKET", "BURGER", "BUTTON", "CACTUS", "CAMERA", "CARROT", "CASTLE", "CHEESE", "CINEMA", "COOKIE", "COFFEE", "CRAYON", "CRYING", "DESERT", "DOMINO", "DRAGON", "FAMILY", "FINGER", "FLOWER", "FOREST", "FROZEN", "GALAXY", "GRAPES", "GUITAR", "HAMMER", "HOTDOG", "JUGGLE", "LAPTOP", "LETTER", "LIZARD", "MONKEY", "MOTHER", "MUDKIP", "MUFFIN", "ORANGE", "PENCIL", "PICNIC", "PICKLE", "PILLOW", "PIRATE", "PISTON", "PLANET", "POLICE", "PORTAL", "PRISON", "RABBIT", "SCHOOL", "SHIELD", "SHORTS", "SKINNY", "SPIDER", "SPIKES", "SPONGE", "SPRING", "SPROUT", "STABLE", "SUMMER", "SUNSET", "TEAPOT", "TEMPLE", "TENNIS", "TETRIS", "TOILET", "TOMATO", "TWITTER", "TURTLE", "WINDOW", "WINTER", "WITHER", "WIZARD", "ZIPPER", "ZOMBIE", "ALCOHOL", "AMERICA", "BAGGAGE", "BATTERY", "BLANKET", "CAPTURE", "CHICKEN", "COCONUT", "COMPASS", "CHICKEN", "CHIMNEY", "CREEPER", "CUPCAKE", "CYCLOPS", "DOLPHIN", "FRISBEE", "FISHING", "FOOTBALL", "FRISBEE", "GARBAGE", "GIRAFFE", "GLASSES", "HAMSTER", "ICEBERG", "MANSION", "MONITOR", "MUSCLES", "NOODLES", "PANCAKE", "PEASANT", "PENGUIN", "PIKACHU", "PLUMBER", "PRESENT", "PYRAMID", "PUMPKIN", "RAINBOW", "RUBBISH", "SHOTGUN", "SNORLAX", "SNOWMAN", "SPEAKER", "STOMACH", "SUNRISE", "TOASTER", "TORNADO", "TRUMPET", "UNICORN", "VOLCANO", "YELLING", "BALLOONS", "BOOKCASE", "BUILDING", "CAMPFIRE", "CANNIBAL", "COMPUTER", "CONFUSED", "DIAMONDS", "DINOSAUR", "ELEPHANT", "EMERALDS", "EYEPATCH", "FACEBOOK", "FIGHTING", "FOOTBALL", "GODZILLA", "KANGAROO", "KEYBOARD", "LOLLIPOP", "MINEPLEX", "MOUNTAIN", "MUSHROOM", "NINTENDO", "NOTEBOOK", "PAINTING", "POKEBALL", "PREGNANT", "PRINCESS", "SKELETON", "SLEEPING", "SLIPPERS", "SQUIRREL", "SUPERMAN", "SWIMMING", "UMBRELLA", "UPPERCUT", "WINDMILL", "ALLIGATOR", "ASTRONAUT", "BUMBLEBEE", "BUTTERFLY", "CHOCOLATE", "EXPLOSION", "HANDCUFFS", "LETTERBOX", "LIGHTNING", "MICROSOFT", "MINECRAFT", "MOTORBIKE", "RASPBERRY", "SIDEBURNS", "SNOWFLAKE", "SPACESHIP", "SPAGHETTI", "STAIRCASE", "TREEHOUSE", "BASKETBALL", "BINOCULARS", "CALCULATOR", "CHARMANDER", "CHESTPLATE", "HELICOPTER", "PLAYSTATION", "TELEVISION", "STRAWBERRY", "SUNGLASSES", "WATERMELON", "BELLY BUTTON", "CAMP FIRE", "CHRISTMAS TREE", "DOOR KNOB", "DRAW MY THING", "FISHING ROD", "GOLF CLUB", "GRIM REAPER", "HARRY POTTER", "HOLDING HANDS", "HORSE RIDING", "HOT AIR BALLOON", "ICE CREAM", "IRON ORE", "MOUNTAIN BIKE", "NIGHT TIME", "POT OF GOLD", "PUMPKIN PIE", "SALT AND PEPPER", "SHAKING HANDS", "STOP SIGN", "SWIMMING POOL", "TENNIS RACKET", "TRAFFIC LIGHTS", "TROLL FACE", "TOP HAT", "UNITED STATES", "VIDEO GAME", "WATER GUN", "ZOMBIE PIGMAN"
 ];
 
+let drawIntervalObj;
 let games = new Map();
 
 io.on('connection', (client) => {
@@ -95,7 +97,7 @@ function handleLeave(client, id, name, key) {
         games.get(key).leave(name, id);  //remove player from games object
         if (games.get(key).numPlayers === 0) { //if no players remaining, delete room from list of games
             games.delete(key);
-            drawIntervalFunc.clear();
+            drawIntervalObj.clear();
             return;
         }
         console.log("User " + client.id + " has left room " + key);
@@ -142,14 +144,13 @@ function handleStartRound(round, key) {
     }
 }
 
-const drawIntervalFunc = (function() {
+/*const drawIntervalFunc = (function() {
     let drawInterval;
     return {
         set: function(key) {
             drawInterval = undefined;
             let time = 0;
             drawInterval = setTimeout(function setDrawInterval() {
-                console.log(time);
                 if (time < 85) {
                     time++;
                     io.sockets.in(key).emit('interval', 85 - time);
@@ -167,19 +168,19 @@ const drawIntervalFunc = (function() {
                 }
             }, 1000)
         },
-        clear: function() {
-            clearInterval(drawInterval);
-            drawInterval = undefined;            
+        get: function() {
+            return drawInterval;    
         }
     }
-})();
+})(); */
 
 function handleStartPlayer(i, key) {
     let word = words[Math.floor(Math.random() * words.length)];
     games.get(key).setWord(word);
     games.get(key).startPlayer(i);
     io.sockets.in(key).emit('startPlayer', i, games.get(key).playerArray, word);
-    drawIntervalFunc.set(key);
+    //drawIntervalFunc.clear();
+    drawIntervalObj = new DrawInterval(key, io, games, handleStartPlayer, games.get(key).currentRound);
 }
 
 function handleDraw(client, drawing, key) {
@@ -199,7 +200,7 @@ function handleMessage(client, message, key, timeLeft, id) {
             //if everyone guesses...
             if (games.get(key).guessedPlayers === (games.get(key).numPlayers) - 1) {
                 io.sockets.in(key).emit('skip');
-                drawIntervalFunc.clear();
+                drawIntervalObj.clear();
                 let timeOut = setTimeout(() => {    //toDo: move this to a function
                     if (games.get(key).currentPlayer === (games.get(key).numPlayers - 1)) {
                         io.sockets.in(key).emit('startRound', games.get(key).currentRound + 1);
