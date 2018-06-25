@@ -6,6 +6,8 @@ function Player(name, id) {
     this.points = 0;
 }
 
+const DrawInterval = require('./drawInterval.js');
+
 module.exports = class Game {
     constructor(key) {
         this.key = key;
@@ -19,6 +21,7 @@ module.exports = class Game {
         this.currentRound = 1;
         this.currentPlayer = 0; //index of current drawing player
         this.word = "";
+        this.drawIntervalObj = {};
     }
     setRounds(rounds) {
         this.rounds = rounds;
@@ -69,6 +72,12 @@ module.exports = class Game {
     startGame() {
         this.started = true;
     }
+    setTimer(key, io, games, handleStartPlayer) {
+        this.drawIntervalObj = new DrawInterval(key, io, games, handleStartPlayer, this.currentRound);
+    }
+    clearTimer() {
+        this.drawIntervalObj.clear();
+    }
     startPlayer(playerIndex) {   //runs once for each player in each round
         if (playerIndex < 0 || playerIndex > (this.numPlayers - 1)) {
             return;
@@ -101,7 +110,5 @@ module.exports = class Game {
         let id = this.playerArray[index].id;
         this.players.get(id).points += points;
         this.playerArray[index].points += points;
-    }
-
-    
+    }    
 }
