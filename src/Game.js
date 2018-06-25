@@ -83,6 +83,10 @@ class Game extends Component {
             guess: ''
         }
     }
+    componentDidUpdate(prevProps) {
+        if (prevProps.messages.length < this.props.messages.length)
+            this.stayScrolled(); // Or: this.scrollBottom
+    }
     componentWillReceiveProps(nextProps) {
         let interval;
         if (nextProps.drawing && !this.props.drawing) {
@@ -95,7 +99,7 @@ class Game extends Component {
                         this.canvas.clear();
                     }
                 }
-            }, 33.33333333333333);
+            }, 100);
         }
         if (this.props.drawing && !nextProps.drawing && this.canvas) {
             this.canvas.clear();
@@ -106,7 +110,9 @@ class Game extends Component {
         if (!this.props.drawing) {
             if (nextProps.currentDrawing) {
                 if (this.canvas) {
-                    this.canvas.loadSaveData(nextProps.currentDrawing, true);
+                    if (this.canvas.getSaveData() !== nextProps.currentDrawing) {
+                        this.canvas.loadSaveData(nextProps.currentDrawing, true);
+                    }                    
                 }
             }
             if (interval && !nextProps.drawing) {
@@ -129,8 +135,12 @@ class Game extends Component {
                         this.canvas.clear();
                     }
                 }
-            }, 33.33333333333333);
+            }, 100);
         }
+    }
+    storeScrolledControllers = ({ stayScrolled, scrollBottom }) => {
+        this.stayScrolled = stayScrolled;
+        this.scrollBottom = scrollBottom;
     }
     handleColorPick = (e) => {
         let color = this.state.color;
@@ -334,11 +344,12 @@ class Game extends Component {
             );
         }
         return (
-            <StayScrolled component="div">
-                <ListGroup>
+            <ListGroup>
+                <StayScrolled component="div" provideControllers={this.storeScrolledControllers}>
                     {messages}
-                </ListGroup>
-            </StayScrolled>
+                </StayScrolled>
+            </ListGroup>
+
         );
     }
     render() {
@@ -356,11 +367,11 @@ class Game extends Component {
                             {this.getChat()}
                         </Col>
                     </Row>
-                    <Row style={{height: '2em'}}>
+                    <Row style={{ height: '2em' }}>
                         <Col xs="9"></Col>
-                        <Col xs="3" style={{padding: '0 0 0 0'}}>
+                        <Col xs="3" style={{ padding: '0 0 0 0' }}>
                             <InputGroup style={styles.chatInputGroupStyle}>
-                                <Input placeholder="Enter a guess" onKeyPress={this.handleKeyPress} onChange={this.handleInput} ref={Button => (this.sendButton = Button)} style={styles.chatInputStyle} disabled={this.props.drawing} />
+                                <Input placeholder="Enter a guess" value={this.state.guess} onKeyPress={this.handleKeyPress} onChange={this.handleInput} ref={Button => (this.sendButton = Button)} style={styles.chatInputStyle} disabled={this.props.drawing} />
                                 <InputGroupAddon addonType="append"><Button color="secondary" size="sm" onClick={this.sendGuess}>Send</Button></InputGroupAddon>
                             </InputGroup>
                         </Col>
