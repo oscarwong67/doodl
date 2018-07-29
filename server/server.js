@@ -94,8 +94,8 @@ function handleLeave(client, id, name, key) {
         client.leave(key);  //leave the room
         games.get(key).leave(name, id);  //remove player from games object
         if (games.get(key).numPlayers === 0) { //if no players remaining, delete room from list of games
-            games.delete(key);
             games.get(key).clearTimer();
+            games.delete(key);            
             return;
         }
         console.log("User " + client.id + " has left room " + key);

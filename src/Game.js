@@ -108,15 +108,10 @@ class Game extends Component {
                 clearInterval(interval);
             }
         }
-        if (!this.props.drawing) {
-            if (nextProps.currentDrawing) {
-                if (this.canvas) {
-                    if (this.canvas.getSaveData() !== nextProps.currentDrawing) {
-                        this.canvas.loadSaveData(nextProps.currentDrawing, true);
-                    }                    
-                }
+        if (!this.props.drawing && nextProps.currentDrawing) {
+            if (this.canvas) {
+                this.canvas.loadSaveData(nextProps.currentDrawing, true);
             }
-            clearInterval(interval);
         }
     }
     componentDidMount() {
