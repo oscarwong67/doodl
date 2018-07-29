@@ -174,6 +174,7 @@ function handleMessage(client, message, key, timeLeft, id) {
                     } else {
                         handleStartPlayer(games.get(key).currentPlayer + 1, key);
                     }
+                    clearTimeout(timeOut);
                 }, 5000);
             }
         } else {

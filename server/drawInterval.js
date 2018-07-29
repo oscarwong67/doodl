@@ -7,6 +7,7 @@ module.exports = class drawIntervalClass {
                 if (time < 85 && games.get(key).guessedPlayers !== (games.get(key).numPlayers) - 1) {
                     time++;
                     io.sockets.in(key).emit('interval', 85 - time);
+                    clearTimeout(this.drawInterval);
                     setTimeout(setDrawInterval, 1000);
                 } else {
                     /*if (games.get(key)) {

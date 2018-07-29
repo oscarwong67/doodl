@@ -3,6 +3,7 @@ import { Button, ButtonGroup, Col, Container, Input, InputGroup, InputGroupAddon
 import CanvasDraw from "react-canvas-draw"; //awesome package tbh
 import FontAwesome from 'react-fontawesome';
 import StayScrolled from 'react-stay-scrolled';
+import { TwitterPicker } from 'react-color';
 
 const styles = {
     containerStyle: {
@@ -115,9 +116,7 @@ class Game extends Component {
                     }                    
                 }
             }
-            if (interval && !nextProps.drawing) {
-                clearInterval(interval);
-            }
+            clearInterval(interval);
         }
     }
     componentDidMount() {
@@ -126,8 +125,9 @@ class Game extends Component {
             canvasHeight: canvasHTML.canvas.clientHeight,
             canvasWidth: canvasHTML.canvas.clientWidth
         });
+        let interval;
         if (this.props.drawing) {
-            let interval = window.setInterval(() => {
+            interval = window.setInterval(() => {
                 if (this.canvas) {
                     let data = this.canvas.getSaveData();
                     this.props.updateDrawing(data);
@@ -136,23 +136,23 @@ class Game extends Component {
                     }
                 }
             }, 100);
+        } else {
+            clearInterval(interval);
         }
     }
     storeScrolledControllers = ({ stayScrolled, scrollBottom }) => {
         this.stayScrolled = stayScrolled;
         this.scrollBottom = scrollBottom;
     }
-    handleColorPick = (e) => {
-        let color = this.state.color;
-        if (e.target.className.includes("color")) {
-            color = e.target.style.backgroundColor;
-        } else if (e.target.className.includes("eraser")) {
-            color = "#FFFFFF";
-        }
+    setEraser = () => {
         this.setState({
-            color: color
+            color: '#FFFFFF'
+        })
+    }
+    handleColorPick = (color) => {
+        this.setState({
+            color: color.hex
         });
-
     }
     setSize = (e) => {
         let size = this.state.size;
@@ -225,48 +225,25 @@ class Game extends Component {
                 <Col id="canvas-col" xs="7" style={styles.colStyle}>
                     <CanvasDraw disabled={!this.props.drawing} ref={canvasDraw => (this.canvas = canvasDraw)} style={styles.canvasStyle} brushColor={this.state.color} brushSize={this.state.size} canvasWidth={this.state.canvasWidth} canvasHeight={this.state.canvasHeight} />
                     <Row className="options" style={styles.optionsStyle}>
-                        <Col xs="12" md="8" style={styles.innerColStyle}>
-                            <ButtonGroup size="lg">
-                                <Button className="color" id="white #FFFFFF" style={{ backgroundColor: '#FFFFFF', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="lightGrey #cecece" style={{ backgroundColor: '#cecece', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="lightRed #fc140c" style={{ backgroundColor: '#fc140c', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="yellow #ffe400" style={{ backgroundColor: '#ffe400', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                            </ButtonGroup>
-                            <ButtonGroup size="lg">
-                                <Button className="color" id="lightGreen #00fb00" style={{ backgroundColor: '#00fb00', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="lightBlue #14f3ff" style={{ backgroundColor: '#14f3ff', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="lightPurple #9242f4" style={{ backgroundColor: '#9242f4', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="lightBrown #8B4513" style={{ backgroundColor: '#8B4513', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                            </ButtonGroup>
+                        <Col xs="12" lg="9" style={styles.innerColStyle}>
+                            <div ref={(ref) => this.colorCol = ref}>
+                                <TwitterPicker width={this.state.pickerWidth} colors={["#FFFFFF", "#cecece", "#fc140c", "#ffe400", "#00fb00", "#14f3ff", "#9242f4", "#8B4513", "#000000", "#4c4c4c", "#740b07", "#ff9000", "#015e0b", "#000080", "#ff4f9e", "#ffddb7"]} color={this.state.color} onChangeComplete={this.handleColorPick} />
+                            </div>
                         </Col>
-                        <Col xs="12" md="4" style={{ paddingLeft: 0, paddingRight: 0 }}>
-                            <ButtonGroup size="lg">
-                                <Button className="utility eraser" id="eraser" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={this.handleColorPick}><p className="text-center eraser"><FontAwesome className="eraser" name="eraser" /></p></Button>
-                                <Button id="undo" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={() => { this.canvas.undo(); }}><p className="text-center undo"><FontAwesome className="undo" name="undo" /></p></Button>
-                            </ButtonGroup>
-                        </Col>
-                    </Row>
-                    <Row className="options" style={styles.optionsStyle}>
-                        <Col xs="12" md="8" style={styles.innerColStyle}>
-                            <ButtonGroup size="lg">
-                                <Button className="color" id="black #000000" style={{ backgroundColor: '#000000', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="darkGrey #4c4c4c" style={{ backgroundColor: '#4c4c4c', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="darkRed #740b07" style={{ backgroundColor: '#740b07', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="orange #ff9000" style={{ backgroundColor: '#ff9000', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                            </ButtonGroup>
-                            <ButtonGroup size="lg">
-                                <Button className="color" id="darkGreen #015e0b" style={{ backgroundColor: '#015e0b', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="darkBlue #000080" style={{ backgroundColor: '#000080', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="pink #ff4f9e" style={{ backgroundColor: '#ff4f9e', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                                <Button className="color" id="peach #ffddb7" style={{ backgroundColor: '#ffddb7', height: '4.5vh' }} onClick={this.handleColorPick}></Button>
-                            </ButtonGroup>
-                        </Col>
-                        <Col xs="12" md="4" style={{ paddingLeft: 0, paddingRight: 0 }}>
-                            <ButtonGroup size="lg">
-                                <Button className="small" id="small" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={this.setSize}><p className="text-center small">&#9679;</p></Button>
-                                <Button className="medium" id="medium" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={this.setSize}><p className="text-center medium">&#11044;</p></Button>
-                                <Button className="large" id="large" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black', fontSize: 24 }} onClick={this.setSize}><p className="text-center large">&#11044;</p></Button>
-                            </ButtonGroup>
+                        <Col xs="12" lg="3" style={{ paddingLeft: 0, paddingRight: 0 }}>
+                            <Row>
+                                <ButtonGroup size="lg">
+                                    <Button className="utility eraser" id="eraser" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={this.setEraser}><p className="text-center eraser"><FontAwesome className="eraser" name="eraser" /></p></Button>
+                                    <Button id="undo" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={() => { this.canvas.undo(); }}><p className="text-center undo"><FontAwesome className="undo" name="undo" /></p></Button>
+                                </ButtonGroup>
+                            </Row>
+                            <Row>
+                                <ButtonGroup size="lg">
+                                    <Button className="small" id="small" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={this.setSize}><p className="text-center small">&#9679;</p></Button>
+                                    <Button className="medium" id="medium" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black' }} onClick={this.setSize}><p className="text-center medium">&#11044;</p></Button>
+                                    <Button className="large" id="large" style={{ backgroundColor: '#FFFFFF', height: '4.5vh', color: 'black', fontSize: 24 }} onClick={this.setSize}><p className="text-center large">&#11044;</p></Button>
+                                </ButtonGroup>
+                            </Row>
                         </Col>
                     </Row>
                 </Col>
