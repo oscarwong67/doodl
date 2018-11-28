@@ -1,4 +1,4 @@
-Welcome to Doodl! A Drawing game where players take turns being assigned words to draw while others race to guess them.
+Welcome to Doodl! A Drawing game where players take turns being assigned words to draw while others race to guess them, built using Node.js/Socket.io, and React.
 <hr>
 
 Running Doodl
