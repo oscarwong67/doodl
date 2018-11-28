@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "http://oscarwong67.github.io/doodl",
   "dependencies": {
-    "bootstrap": "^4.1.1",
+    "bootstrap": "^4.1.2",
     "random-base64-string": "^1.0.1",
     "react": "^16.3.2",
     "react-canvas-draw": "^0.1.9",
